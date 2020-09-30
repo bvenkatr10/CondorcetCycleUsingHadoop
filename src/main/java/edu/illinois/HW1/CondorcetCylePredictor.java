@@ -99,14 +99,15 @@ public class CondorcetCylePredictor {
 
     @Override
     public void cleanup(Context context) throws IOException, InterruptedException {
-      Optional<Integer> f =
+      Optional<Integer> maxTotalWinCount =
           hashMap.values().stream().collect(Collectors.maxBy(Comparator.comparing(item -> item)));
-      Set<String> whateweNeed =
+      maxTotalWinCount.orElseThrow(() -> new NullPointerException("Missing Max total win count"));
+      Set<String> finalWinnerList =
           hashMap.entrySet().stream()
-              .filter(entry -> Objects.equals(entry.getValue(), f.get()))
+              .filter(entry -> Objects.equals(entry.getValue(), maxTotalWinCount.get()))
               .map(Map.Entry::getKey)
               .collect(Collectors.toSet());
-      context.write(new Text("Winner(s) is\\are"), new Text(whateweNeed.toString()));
+      context.write(new Text("Winner(s) is\\are"), new Text(finalWinnerList.toString()));
     }
   }
 
